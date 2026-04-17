@@ -42,14 +42,14 @@
             </div>
         </nav>
         <!-- Masthead-->
-        <header class="masthead" style="background-image: url('images/headshot.jpeg'); background-position: center top; background-size: cover;">
-            <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
-                <div class="d-flex justify-content-center">
-                    <div class="text-center">
-                        <h1 class="mx-auto my-0 text-uppercase">David Hirst</h1>
-                        <h2 class="text-white-50 mx-auto mt-2 mb-5">"Education is the power, to think clearly, the power to act well in the world's work, and the power to appreciate life." - Brigham Young</h2>
-                        <a class="btn btn-primary" href="#about">Check Me Out</a>
-                    </div>
+        <header class="masthead" style="background-image: url('images/headshot.jpeg'); background-position: center 10%; background-size: cover; position:relative;">
+            <!-- Dark gradient overlay -->
+            <div style="position:absolute; inset:0; background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.6) 100%);"></div>
+            <div class="container px-4 px-lg-5 d-flex h-100 align-items-end justify-content-center" style="position:relative; z-index:2; padding-bottom:4rem;">
+                <div class="text-center">
+                    <h1 class="mx-auto my-0 text-uppercase" style="font-size:3.5rem; font-weight:800; letter-spacing:0.12em; color:#fff; text-shadow: 0 2px 12px rgba(0,0,0,0.5);">David Hirst</h1>
+                    <p class="mx-auto mt-3 mb-4" style="color:rgba(255,255,255,0.82); font-size:1rem; max-width:520px; font-style:italic; line-height:1.7;">"Education is the power to think clearly, to act well in the world's work, and to appreciate life." — Brigham Young</p>
+                    <a class="btn btn-primary px-4 py-2" href="#about" style="letter-spacing:0.06em;">Check Me Out</a>
                 </div>
             </div>
         </header>
