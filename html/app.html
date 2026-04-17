@@ -1,73 +1,445 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riddle Generator</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini Golf - David Hirst</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #ffe4e1;
-            color: #333;
-            text-align: center;
-            padding: 20px;
+            background: #111;
+            font-family: 'Segoe UI', sans-serif;
+            color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-        #riddle-container {
-            margin: 20px auto;
-            max-width: 600px;
+
+        header {
+            width: 100%;
+            background: #000;
+            padding: 0.9rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #00bcd4;
         }
-        button {
-            background-color: #ff69b4;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 10px;
+        .back-link {
+            color: #00bcd4;
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
         }
-        button:hover {
-            background-color: #ff1493;
+        header h1 { font-size: 1.5rem; letter-spacing: 0.12em; color: #fff; }
+
+        #hud {
+            display: flex;
+            gap: 2rem;
+            padding: 0.6rem 2.5rem;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 8px;
+            margin: 0.8rem 0 0.4rem;
         }
-        #answer {
+        .hud-item { text-align: center; min-width: 60px; }
+        .hud-label { font-size: 0.65rem; letter-spacing: 0.15em; color: #555; text-transform: uppercase; }
+        .hud-value { font-size: 1.5rem; font-weight: 700; color: #00bcd4; line-height: 1.2; }
+
+        #gameWrap { position: relative; }
+
+        canvas {
+            display: block;
+            border: 2px solid #222;
+            border-radius: 6px;
+            cursor: crosshair;
+        }
+
+        #overlay {
             display: none;
-            margin-top: 20px;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(5,5,5,0.93);
+            border: 2px solid #00bcd4;
+            border-radius: 14px;
+            padding: 2rem 2.5rem;
+            text-align: center;
+            min-width: 280px;
+            z-index: 20;
         }
+        #overlay h2 { color: #00bcd4; font-size: 1.6rem; margin-bottom: 0.4rem; letter-spacing: 0.05em; }
+        #overlay p  { color: #aaa; font-size: 1rem; margin-bottom: 1.2rem; }
+        .overlay-btn {
+            padding: 0.55rem 2rem;
+            background: #00bcd4;
+            border: none;
+            border-radius: 6px;
+            color: #000;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+        }
+        .overlay-btn:hover { background: #00e5ff; }
+
+        #scoreTable { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 1.2rem; }
+        #scoreTable th { color: #00bcd4; padding: 0.3rem 0.6rem; border-bottom: 1px solid #333; text-align: center; }
+        #scoreTable td { padding: 0.3rem 0.6rem; text-align: center; color: #ccc; }
+        #scoreTable tfoot td { font-weight: 700; color: #fff; border-top: 1px solid #333; }
+
+        #powerWrap { width: 800px; max-width: 100%; margin: 0.4rem 0 0; }
+        .power-label { font-size: 0.65rem; letter-spacing: 0.15em; color: #555; text-transform: uppercase; text-align: center; margin-bottom: 3px; }
+        #powerBar { height: 7px; background: #1a1a1a; border-radius: 4px; overflow: hidden; border: 1px solid #222; }
+        #powerFill { height: 100%; width: 0%; border-radius: 4px; background: linear-gradient(to right, #00bcd4, #ffeb3b, #f44336); transition: width 0.04s linear; }
+
+        #hint { font-size: 0.78rem; color: #444; text-align: center; margin-top: 0.5rem; letter-spacing: 0.04em; }
     </style>
 </head>
 <body>
-    <h1>Riddle Generator</h1>
-    <div id="riddle-container">
-        <p id="riddle">Click "New Riddle" to start!</p>
-        <button onclick="newRiddle()">New Riddle</button>
-        <button onclick="showAnswer()">Show Answer</button>
-        <p id="answer"></p>
+
+<header>
+    <a class="back-link" href="scratch.html">← Back to Scratch</a>
+    <h1>⛳ MINI GOLF</h1>
+    <div style="width:80px"></div>
+</header>
+
+<div id="hud">
+    <div class="hud-item"><div class="hud-label">Hole</div><div class="hud-value" id="hudHole">1/5</div></div>
+    <div class="hud-item"><div class="hud-label">Par</div><div class="hud-value" id="hudPar">3</div></div>
+    <div class="hud-item"><div class="hud-label">Strokes</div><div class="hud-value" id="hudStrokes">0</div></div>
+    <div class="hud-item"><div class="hud-label">Score</div><div class="hud-value" id="hudScore">E</div></div>
+</div>
+
+<div id="gameWrap">
+    <canvas id="gc" width="800" height="480"></canvas>
+    <div id="overlay">
+        <h2 id="ovTitle">Mini Golf</h2>
+        <p id="ovBody">Par 3</p>
+        <button class="overlay-btn" id="ovBtn">Play</button>
     </div>
-    <p><a href="scratch.html">Back to Scratch Page</a></p>
+</div>
 
-    <script>
-        const riddles = [
-            { question: "What has keys but can't open locks?", answer: "A piano" },
-            { question: "What comes once in a minute, twice in a moment, but never in a thousand years?", answer: "The letter M" },
-            { question: "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?", answer: "An echo" },
-            { question: "What has a head, a tail, is brown, and has no legs?", answer: "A penny" },
-            { question: "What can you break, even if you never pick it up or touch it?", answer: "A promise" }
-        ];
+<div id="powerWrap">
+    <div class="power-label">Power</div>
+    <div id="powerBar"><div id="powerFill"></div></div>
+</div>
+<div id="hint">Click near the ball and drag back — release to shoot</div>
 
-        let currentRiddle = null;
+<script>
+"use strict";
+const canvas = document.getElementById('gc');
+const ctx    = canvas.getContext('2d');
 
-        function newRiddle() {
-            currentRiddle = riddles[Math.floor(Math.random() * riddles.length)];
-            document.getElementById('riddle').textContent = currentRiddle.question;
-            document.getElementById('answer').style.display = 'none';
-            document.getElementById('answer').textContent = '';
-        }
+const HOLES = [
+  {
+    name:"Opening Drive", par:3,
+    tee:{x:100,y:240}, cup:{x:690,y:240,r:13},
+    fairway:[{x:55,y:165,w:690,h:150}],
+    sand:[], water:[],
+    trees:[{x:340,y:175,r:20},{x:510,y:304,r:18}]
+  },
+  {
+    name:"Dogleg Right", par:3,
+    tee:{x:100,y:220}, cup:{x:420,y:400,r:13},
+    fairway:[{x:55,y:155,w:360,h:135},{x:340,y:155,w:135,h:285}],
+    sand:[{x:360,y:168,w:90,h:70}], water:[],
+    trees:[{x:200,y:150,r:19},{x:205,y:292,r:17},{x:505,y:310,r:20}]
+  },
+  {
+    name:"Water Crossing", par:4,
+    tee:{x:100,y:240}, cup:{x:690,y:240,r:13},
+    fairway:[{x:55,y:160,w:690,h:160}],
+    sand:[{x:560,y:185,w:85,h:110}],
+    water:[{x:285,y:188,w:140,h:104}],
+    trees:[{x:200,y:160,r:16},{x:200,y:320,r:16},{x:470,y:165,r:16}]
+  },
+  {
+    name:"S-Curve", par:4,
+    tee:{x:100,y:145}, cup:{x:690,y:360,r:13},
+    fairway:[{x:55,y:90,w:310,h:120},{x:280,y:90,w:130,h:270},{x:280,y:280,w:475,h:120}],
+    sand:[{x:310,y:102,w:65,h:75},{x:510,y:292,w:80,h:90}],
+    water:[{x:100,y:228,w:155,h:85}],
+    trees:[{x:570,y:278,r:20},{x:430,y:408,r:18}]
+  },
+  {
+    name:"Championship", par:5,
+    tee:{x:100,y:240}, cup:{x:700,y:380,r:13},
+    fairway:[
+      {x:55,y:175,w:210,h:135},{x:175,y:100,w:135,h:280},
+      {x:175,y:100,w:430,h:130},{x:470,y:100,w:135,h:315},
+      {x:470,y:310,w:285,h:130}
+    ],
+    sand:[{x:195,y:112,w:100,h:78},{x:490,y:355,w:85,h:80}],
+    water:[{x:280,y:318,w:160,h:75},{x:500,y:115,w:90,h:90}],
+    trees:[{x:370,y:225,r:22},{x:610,y:180,r:18},{x:610,y:330,r:18}]
+  }
+];
 
-        function showAnswer() {
-            if (currentRiddle) {
-                document.getElementById('answer').textContent = "Answer: " + currentRiddle.answer;
-                document.getElementById('answer').style.display = 'block';
-            }
-        }
-    </script>
+let holeIdx=0, strokes=0, totalStrokes=0, totalPar=0, scorecard=[];
+let ball={x:0,y:0,vx:0,vy:0,r:8};
+let lastSafe={x:0,y:0};
+let inMotion=false, holed=false, dragging=false;
+let mouse={x:0,y:0};
+
+const MAX_POWER=16, FF=0.9865, FR=0.870, FS=0.840;
+
+function h() { return HOLES[holeIdx]; }
+function inRects(x,y,rects){ return rects.some(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h); }
+function hitTree(x,y){
+    for(const t of h().trees){
+        const dx=x-t.x,dy=y-t.y;
+        if(dx*dx+dy*dy<(t.r+ball.r)*(t.r+ball.r)) return t;
+    }
+    return null;
+}
+function diffLabel(d){ return d===0?'E':d>0?`+${d}`:`${d}`; }
+function scoreColor(d){ return d<0?'#00bcd4':d>0?'#f44336':'#aaa'; }
+
+function updateHUD(){
+    const hole=h();
+    document.getElementById('hudHole').textContent=`${holeIdx+1}/${HOLES.length}`;
+    document.getElementById('hudPar').textContent=hole.par;
+    document.getElementById('hudStrokes').textContent=strokes;
+    const cp=scorecard.reduce((s,d)=>s+d.par,0);
+    const cs=scorecard.reduce((s,d)=>s+d.strokes,0);
+    const diff=cs-cp;
+    const el=document.getElementById('hudScore');
+    el.textContent=diffLabel(diff); el.style.color=scoreColor(diff);
+}
+
+function showOverlay(title,body,btnText,btnAction){
+    document.getElementById('ovTitle').textContent=title;
+    document.getElementById('ovBody').textContent=body;
+    const btn=document.getElementById('ovBtn');
+    btn.textContent=btnText; btn.onclick=btnAction;
+    document.getElementById('overlay').style.display='block';
+}
+function hideOverlay(){ document.getElementById('overlay').style.display='none'; }
+
+function startHole(){
+    const hole=h();
+    ball.x=hole.tee.x; ball.y=hole.tee.y;
+    ball.vx=0; ball.vy=0;
+    lastSafe={x:hole.tee.x,y:hole.tee.y};
+    strokes=0; inMotion=false; holed=false; dragging=false;
+    document.getElementById('powerFill').style.width='0%';
+    updateHUD();
+    showOverlay(`Hole ${holeIdx+1}: ${hole.name}`,`Par ${hole.par}`,holeIdx===0?'Tee Off! ⛳':'Play',hideOverlay);
+}
+
+function onHoled(){
+    holed=true; inMotion=false; dragging=false;
+    document.getElementById('powerFill').style.width='0%';
+    const hole=h(); const diff=strokes-hole.par;
+    let emoji=strokes===1?'🏆 Hole in One!':diff<=-2?'🦅 Eagle!':diff===-1?'🐦 Birdie!':diff===0?'👌 Par!':diff===1?'😬 Bogey':`😅 +${diff}`;
+    scorecard.push({hole:holeIdx+1,par:hole.par,strokes});
+    totalStrokes+=strokes; totalPar+=hole.par; updateHUD();
+    setTimeout(()=>{
+        if(holeIdx<HOLES.length-1){
+            showOverlay(emoji,`${strokes} stroke${strokes!==1?'s':''} · Par ${hole.par}`,'Next Hole →',()=>{ holeIdx++; startHole(); });
+        } else { showScorecard(); }
+    },400);
+}
+
+function showScorecard(){
+    const diff=totalStrokes-totalPar;
+    const rows=scorecard.map(d=>{
+        const d2=d.strokes-d.par;
+        return `<tr><td>Hole ${d.hole}</td><td>${d.par}</td><td>${d.strokes}</td><td style="color:${scoreColor(d2)};font-weight:600">${diffLabel(d2)}</td></tr>`;
+    }).join('');
+    document.getElementById('overlay').innerHTML=`
+        <h2>🏌️ Final Scorecard</h2>
+        <table id="scoreTable">
+            <thead><tr><th>Hole</th><th>Par</th><th>Score</th><th>+/-</th></tr></thead>
+            <tbody>${rows}</tbody>
+            <tfoot><tr><td>Total</td><td>${totalPar}</td><td>${totalStrokes}</td>
+            <td style="color:${scoreColor(diff)}">${diffLabel(diff)}</td></tr></tfoot>
+        </table>
+        <button class="overlay-btn" onclick="restartGame()">Play Again</button>`;
+    document.getElementById('overlay').style.display='block';
+}
+
+function restartGame(){
+    holeIdx=0; totalStrokes=0; totalPar=0; scorecard=[];
+    document.getElementById('overlay').innerHTML=`
+        <h2 id="ovTitle"></h2><p id="ovBody"></p>
+        <button class="overlay-btn" id="ovBtn">Play</button>`;
+    startHole();
+}
+
+// Drawing
+function drawCourse(){
+    const hole=h();
+    ctx.fillStyle='#1e4011'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='rgba(0,0,0,0.07)';
+    for(let x=0;x<canvas.width;x+=20) for(let y=0;y<canvas.height;y+=20) ctx.fillRect(x,y,10,10);
+
+    for(const seg of hole.fairway){
+        ctx.fillStyle='#3a8022'; ctx.fillRect(seg.x,seg.y,seg.w,seg.h);
+        ctx.fillStyle='rgba(255,255,255,0.025)';
+        for(let sx=seg.x;sx<seg.x+seg.w;sx+=30) ctx.fillRect(sx,seg.y,15,seg.h);
+        ctx.strokeStyle='#2d6618'; ctx.lineWidth=1.5; ctx.strokeRect(seg.x,seg.y,seg.w,seg.h);
+    }
+    for(const w of hole.water){
+        ctx.fillStyle='#1565c0'; ctx.fillRect(w.x,w.y,w.w,w.h);
+        ctx.fillStyle='rgba(100,181,246,0.22)';
+        for(let wy=w.y+5;wy<w.y+w.h-5;wy+=12) ctx.fillRect(w.x+5,wy,w.w-10,4);
+        ctx.strokeStyle='#0d47a1'; ctx.lineWidth=1.5; ctx.strokeRect(w.x,w.y,w.w,w.h);
+    }
+    for(const s of hole.sand){
+        ctx.fillStyle='#c9a227'; ctx.fillRect(s.x,s.y,s.w,s.h);
+        ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillRect(s.x+4,s.y+4,s.w*0.4,s.h*0.3);
+        ctx.strokeStyle='#a07d15'; ctx.lineWidth=1; ctx.strokeRect(s.x,s.y,s.w,s.h);
+    }
+    for(const t of hole.trees){
+        ctx.beginPath(); ctx.ellipse(t.x+5,t.y+5,t.r,t.r*0.55,0.3,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,0,0,0.35)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(t.x,t.y,t.r,0,Math.PI*2);
+        ctx.fillStyle='#145214'; ctx.fill();
+        ctx.strokeStyle='#0a3a0a'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(t.x-t.r*0.28,t.y-t.r*0.28,t.r*0.38,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,255,255,0.08)'; ctx.fill();
+    }
+
+    // Tee
+    ctx.beginPath(); ctx.arc(hole.tee.x,hole.tee.y,7,0,Math.PI*2);
+    ctx.fillStyle='#fff'; ctx.fill();
+    ctx.fillStyle='#00bcd4'; ctx.font='bold 10px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('TEE',hole.tee.x,hole.tee.y-11);
+
+    // Cup
+    ctx.beginPath(); ctx.arc(hole.cup.x,hole.cup.y,hole.cup.r,0,Math.PI*2);
+    ctx.fillStyle='#000'; ctx.fill(); ctx.strokeStyle='#ccc'; ctx.lineWidth=2; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(hole.cup.x,hole.cup.y-hole.cup.r+2); ctx.lineTo(hole.cup.x,hole.cup.y-hole.cup.r-26);
+    ctx.strokeStyle='#bbb'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(hole.cup.x,hole.cup.y-hole.cup.r-26);
+    ctx.lineTo(hole.cup.x+17,hole.cup.y-hole.cup.r-19); ctx.lineTo(hole.cup.x,hole.cup.y-hole.cup.r-12);
+    ctx.closePath(); ctx.fillStyle='#e53935'; ctx.fill();
+
+    // HUD badge
+    ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(8,8,100,26);
+    ctx.fillStyle='#00bcd4'; ctx.font='bold 11px Segoe UI'; ctx.textAlign='left';
+    ctx.fillText(`HOLE ${holeIdx+1}  PAR ${hole.par}`,14,25);
+}
+
+function drawBall(){
+    if(holed) return;
+    ctx.beginPath(); ctx.ellipse(ball.x+3,ball.y+4,ball.r,ball.r*0.5,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);
+    const g=ctx.createRadialGradient(ball.x-3,ball.y-3,1,ball.x,ball.y,ball.r);
+    g.addColorStop(0,'#ffffff'); g.addColorStop(1,'#d0d0d0');
+    ctx.fillStyle=g; ctx.fill(); ctx.strokeStyle='#aaa'; ctx.lineWidth=0.8; ctx.stroke();
+}
+
+function drawAim(){
+    if(!dragging||inMotion||holed) return;
+    const dx=ball.x-mouse.x, dy=ball.y-mouse.y;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<4){ document.getElementById('powerFill').style.width='0%'; return; }
+    const power=Math.min(dist/110*MAX_POWER,MAX_POWER);
+    document.getElementById('powerFill').style.width=(power/MAX_POWER*100)+'%';
+    const nx=dx/dist, ny=dy/dist;
+    const lineLen=Math.min(dist*1.6,170);
+    const t=power/MAX_POWER;
+    const r=Math.round(255*t), g2=Math.round(255*(1-t));
+    ctx.save();
+    ctx.setLineDash([7,5]);
+    ctx.beginPath(); ctx.moveTo(ball.x,ball.y); ctx.lineTo(ball.x+nx*lineLen,ball.y+ny*lineLen);
+    ctx.strokeStyle=`rgba(${r},${g2},180,0.75)`; ctx.lineWidth=2; ctx.stroke();
+    ctx.setLineDash([]);
+    const ax=ball.x+nx*lineLen, ay=ball.y+ny*lineLen, angle=Math.atan2(ny,nx);
+    ctx.beginPath(); ctx.moveTo(ax,ay);
+    ctx.lineTo(ax-13*Math.cos(angle-0.42),ay-13*Math.sin(angle-0.42));
+    ctx.lineTo(ax-13*Math.cos(angle+0.42),ay-13*Math.sin(angle+0.42));
+    ctx.closePath(); ctx.fillStyle=`rgba(${r},${g2},180,0.75)`; ctx.fill();
+    ctx.restore();
+}
+
+function updateBall(){
+    if(!inMotion||holed) return;
+    const hole=h();
+    ball.x+=ball.vx; ball.y+=ball.vy;
+
+    if(ball.x-ball.r<0){ball.x=ball.r;ball.vx*=-0.55;}
+    if(ball.x+ball.r>canvas.width){ball.x=canvas.width-ball.r;ball.vx*=-0.55;}
+    if(ball.y-ball.r<0){ball.y=ball.r;ball.vy*=-0.55;}
+    if(ball.y+ball.r>canvas.height){ball.y=canvas.height-ball.r;ball.vy*=-0.55;}
+
+    const tree=hitTree(ball.x,ball.y);
+    if(tree){
+        const dx=ball.x-tree.x,dy=ball.y-tree.y;
+        const dist=Math.sqrt(dx*dx+dy*dy)||1;
+        const nx=dx/dist,ny=dy/dist,dot=ball.vx*nx+ball.vy*ny;
+        ball.vx=(ball.vx-2*dot*nx)*0.65; ball.vy=(ball.vy-2*dot*ny)*0.65;
+        ball.x=tree.x+nx*(tree.r+ball.r+1); ball.y=tree.y+ny*(tree.r+ball.r+1);
+    }
+
+    if(inRects(ball.x,ball.y,hole.water)){
+        strokes++; ball.x=lastSafe.x; ball.y=lastSafe.y; ball.vx=0; ball.vy=0;
+        inMotion=false; document.getElementById('powerFill').style.width='0%';
+        updateHUD();
+        showOverlay('💧 Water Hazard!','+1 Penalty · Back to last position','Continue',hideOverlay);
+        return;
+    }
+
+    if(inRects(ball.x,ball.y,hole.fairway)){
+        lastSafe={x:ball.x,y:ball.y};
+        if(inRects(ball.x,ball.y,hole.sand)){ball.vx*=FS;ball.vy*=FS;}
+        else{ball.vx*=FF;ball.vy*=FF;}
+    } else {ball.vx*=FR;ball.vy*=FR;}
+
+    const cup=hole.cup,cdx=ball.x-cup.x,cdy=ball.y-cup.y;
+    if(cdx*cdx+cdy*cdy<(cup.r+ball.r*0.5)*(cup.r+ball.r*0.5)){
+        ball.x=cup.x;ball.y=cup.y; onHoled(); return;
+    }
+    if(Math.abs(ball.vx)<0.07&&Math.abs(ball.vy)<0.07){
+        ball.vx=0;ball.vy=0;inMotion=false;
+        document.getElementById('powerFill').style.width='0%';
+    }
+}
+
+function getPos(e){
+    const r=canvas.getBoundingClientRect();
+    const s=e.touches?e.touches[0]:e;
+    return{x:s.clientX-r.left,y:s.clientY-r.top};
+}
+function onDown(e){
+    if(inMotion||holed) return;
+    const p=getPos(e),dx=p.x-ball.x,dy=p.y-ball.y;
+    if(dx*dx+dy*dy<32*32){dragging=true;mouse=p;}
+}
+function onMove(e){ if(e.touches) e.preventDefault(); mouse=getPos(e); }
+function onUp(e){
+    if(!dragging||inMotion||holed) return;
+    dragging=false;
+    const p=getPos(e),dx=ball.x-p.x,dy=ball.y-p.y;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<4){document.getElementById('powerFill').style.width='0%';return;}
+    const power=Math.min(dist/110*MAX_POWER,MAX_POWER);
+    ball.vx=(dx/dist)*power; ball.vy=(dy/dist)*power;
+    inMotion=true; strokes++;
+    document.getElementById('powerFill').style.width='0%';
+    updateHUD();
+}
+
+canvas.addEventListener('mousedown',onDown);
+canvas.addEventListener('mousemove',onMove);
+canvas.addEventListener('mouseup',onUp);
+canvas.addEventListener('touchstart',onDown,{passive:false});
+canvas.addEventListener('touchmove',onMove,{passive:false});
+canvas.addEventListener('touchend',onUp,{passive:false});
+
+function loop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawCourse(); updateBall(); drawAim(); drawBall();
+    requestAnimationFrame(loop);
+}
+
+startHole();
+loop();
+</script>
 </body>
 </html>
