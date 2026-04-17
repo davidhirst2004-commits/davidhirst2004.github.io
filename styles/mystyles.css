@@ -15,7 +15,12 @@ body {
 
 .blacktext {
   --bs-text-opacity: 1;
-  color: #f5f5f5 !important;
+  color: #c8c8c8 !important;
+  font-size: 1.1rem;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+  max-width: 680px;
+  margin: 0 auto 0.75rem auto;
 }
 
 .linkedin {
@@ -28,9 +33,12 @@ body {
 }
 
 .livelife {
-    font-family: 'Nunito', sans-serif;
-    font-size: 50px;
+    font-family: 'Varela Round', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
     color: #00bcd4;
+    margin-bottom: 1.2rem;
 }
 
 .secthead {
