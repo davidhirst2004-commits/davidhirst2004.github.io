@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riddle Generator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ffe4e1;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        #riddle-container {
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #ff1493;
+        }
+        #answer {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Riddle Generator</h1>
+    <div id="riddle-container">
+        <p id="riddle">Click "New Riddle" to start!</p>
+        <button onclick="newRiddle()">New Riddle</button>
+        <button onclick="showAnswer()">Show Answer</button>
+        <p id="answer"></p>
+    </div>
+    <p><a href="scratch.html">Back to Scratch Page</a></p>
+
+    <script>
+        const riddles = [
+            { question: "What has keys but can't open locks?", answer: "A piano" },
+            { question: "What comes once in a minute, twice in a moment, but never in a thousand years?", answer: "The letter M" },
+            { question: "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?", answer: "An echo" },
+            { question: "What has a head, a tail, is brown, and has no legs?", answer: "A penny" },
+            { question: "What can you break, even if you never pick it up or touch it?", answer: "A promise" }
+        ];
+
+        let currentRiddle = null;
+
+        function newRiddle() {
+            currentRiddle = riddles[Math.floor(Math.random() * riddles.length)];
+            document.getElementById('riddle').textContent = currentRiddle.question;
+            document.getElementById('answer').style.display = 'none';
+            document.getElementById('answer').textContent = '';
+        }
+
+        function showAnswer() {
+            if (currentRiddle) {
+                document.getElementById('answer').textContent = "Answer: " + currentRiddle.answer;
+                document.getElementById('answer').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
