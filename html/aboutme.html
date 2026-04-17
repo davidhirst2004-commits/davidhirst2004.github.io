@@ -41,13 +41,15 @@
         </nav>
 
         <!-- Masthead -->
-        <header class="masthead" style="background-image: url('../images/red ledges golf.jpeg')">
-            <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+        <header class="masthead" style="background-image: url('../images/red ledges golf.jpeg'); background-position: center center; background-size: cover; position: relative;">
+            <!-- Dark gradient overlay matching home page style -->
+            <div style="position:absolute; inset:0; background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.6) 100%);"></div>
+            <div class="container px-4 px-lg-5 d-flex h-100 align-items-end justify-content-center" style="position:relative; z-index:2; padding-bottom:4rem;">
                 <div class="text-center">
-                    <h1 class="mx-auto my-0 text-uppercase aboutmepadding">David R. Hirst</h1>
-                    <h2 class="text-white-50 mx-auto mt-2 mb-5" style="font-size:1.1rem;">Pre-Business · BYU · Finance &amp; Investment Banking</h2>
-                    <a class="btn btn-primary me-2" href="#edu">View Résumé</a>
-                    <a class="btn btn-outline-light" target="_blank" href="https://www.linkedin.com/in/davidrhirst/"><i class="fab fa-linkedin me-1"></i>LinkedIn</a>
+                    <h1 class="mx-auto my-0 text-uppercase" style="font-size:3.5rem; font-weight:800; letter-spacing:0.12em; color:#fff; text-shadow: 0 2px 12px rgba(0,0,0,0.5);">David R. Hirst</h1>
+                    <p class="mx-auto mt-3 mb-4" style="color:rgba(255,255,255,0.82); font-size:1rem; max-width:480px; font-style:italic; line-height:1.7;">Pre-Business · BYU · Finance &amp; Investment Banking</p>
+                    <a class="btn btn-primary me-2 px-4 py-2" href="#edu" style="letter-spacing:0.06em;">View Résumé</a>
+                    <a class="btn btn-outline-light px-4 py-2" target="_blank" href="https://www.linkedin.com/in/davidrhirst/" style="letter-spacing:0.06em;"><i class="fab fa-linkedin me-1"></i>LinkedIn</a>
                 </div>
             </div>
         </header>
