@@ -56,25 +56,21 @@
         
         <!--This talks a little more about me in and sends a link to my resume-->
         
-        <section class="edubackground text-center" id="about">
-            <div class="edubackground">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-lg-8 pt-5">
-                        <h2 class="livelife">Balancing Work and Play</h2>
-                        <p class="blacktext">
-                            I manage my work-life balance by staying focused on my finance studies and investment banking goals, while enjoying golf outings and quality time with my girlfriend. Work hard to achieve my ambitions, and play hard to recharge and build meaningful relationships. To see my mix of professional and personal work and play, check out <a href="html/aboutme.html">my resume</a>.
-                        </p>
-                    </div>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col-md-5">
-                        <img class="img-fluid" src="images/golfing in bear lake.jpeg" alt="David Hirst golfing" />
-                    </div>
-                    <div class="col-md-1"></div> <!-- Space between -->
-                    <div class="col-md-5">
-                        <img class="img-fluid" src="images/picture with girl.jpeg" alt="David Hirst with girlfriend" />
-                    </div>
-                </div>
+        <section id="about" style="position:relative; min-height:80vh; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <!-- Background images split left/right -->
+            <div style="position:absolute; inset:0; display:flex;">
+                <div style="flex:1; background:url('images/golfing in bear lake.jpeg') center center / cover no-repeat;"></div>
+                <div style="flex:1; background:url('images/picture with girl.jpeg') center center / cover no-repeat;"></div>
+            </div>
+            <!-- Dark overlay -->
+            <div style="position:absolute; inset:0; background:rgba(0,0,0,0.55);"></div>
+            <!-- Text content -->
+            <div style="position:relative; z-index:2; text-align:center; padding:4rem 2rem; max-width:800px;">
+                <h2 class="livelife" style="color:#fff; font-size:3rem; margin-bottom:1.5rem;">Balancing Work and Play</h2>
+                <p style="color:rgba(255,255,255,0.85); font-size:1.15rem; line-height:1.9; margin-bottom:2rem;">
+                    I manage my work-life balance by staying focused on my finance studies and investment banking goals, while enjoying golf outings and quality time with my girlfriend. Work hard to achieve my ambitions, and play hard to recharge and build meaningful relationships.
+                </p>
+                <a href="html/aboutme.html" class="btn btn-primary px-4 py-2" style="font-size:1rem; letter-spacing:0.05em;">View My Résumé</a>
             </div>
         </section>
         
